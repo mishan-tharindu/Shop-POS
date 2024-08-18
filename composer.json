@@ -1,0 +1,17 @@
+{
+    "name": "mt/clothing-shop-pos",
+    "description": "Clothing Shop POS Plugin",
+    "autoload": {
+        "psr-4": {
+            "Mt\\ClothingShopPos\\": "src/",
+            "Inc\\":"includes/"
+        }
+    },
+    "authors": [
+        {
+            "name": "V Mishan Tharindu",
+            "email": "150178698+mishan-tharindu@users.noreply.github.com"
+        }
+    ],
+    "require": {}
+}
