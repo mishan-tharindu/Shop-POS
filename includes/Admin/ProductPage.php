@@ -12,7 +12,7 @@ class ProductPage {
         $table_name = $wpdb->prefix . 'mt_products';
         $products = $wpdb->get_results("SELECT * FROM $table_name");
 
-        // Check for the 'status' query parameter to show the success message
+       // Check for the 'status' query parameter to show the success message
         if (isset($_GET['status']) && $_GET['status'] === 'success') {
             echo '<div class="updated notice"><p>Product successfully registered!</p></div>';
         }
@@ -100,35 +100,35 @@ class ProductPage {
         </div>
         <?php
 
-    echo '<div class="wrap">';
-    echo '<h1>Registered Products</h1>';
+        echo '<div class="wrap">';
+        echo '<h1>Registered Products</h1>';
 
-    // Success messages for delete and update
-    if (isset($_GET['status']) && $_GET['status'] === 'deleted') {
-        echo '<div class="notice notice-success is-dismissible"><p>Product deleted successfully!</p></div>';
-    } elseif (isset($_GET['status']) && $_GET['status'] === 'updated') {
-        echo '<div class="notice notice-success is-dismissible"><p>Product updated successfully!</p></div>';
-    }
+        // Success messages for delete and update
+        if (isset($_GET['status']) && $_GET['status'] === 'deleted') {
+            echo '<div class="notice notice-success is-dismissible"><p>Product deleted successfully!</p></div>';
+        } elseif (isset($_GET['status']) && $_GET['status'] === 'updated') {
+            echo '<div class="notice notice-success is-dismissible"><p>Product updated successfully!</p></div>';
+        }
 
-    echo '<table class="wp-list-table widefat fixed striped">';
-    echo '<thead><tr><th>SKU</th><th>Name</th><th>Description</th><th>Category</th><th>Price</th><th>Quantity</th><th>Actions</th></tr></thead>';
-    echo '<tbody>';
-    foreach ($products as $product) {
-        echo '<tr>';
-        echo '<td>' . esc_html($product->sku) . '</td>';
-        echo '<td>' . esc_html($product->name) . '</td>';
-        echo '<td>' . esc_html($product->description) . '</td>';
-        echo '<td>' . esc_html($product->category) . '</td>';
-        echo '<td>' . esc_html($product->price) . '</td>';
-        echo '<td>' . esc_html($product->quantity) . '</td>';
-        echo '<td>';
-        echo '<a href="' . admin_url('admin.php?page=product-management&action=edit&id=' . esc_attr($product->id)) . '">Edit</a> | ';
-        echo '<a href="' . wp_nonce_url(admin_url('admin-post.php?action=delete_product&id=' . esc_attr($product->id)), 'delete_product_action', 'delete_product_nonce') . '" onclick="return confirm(\'Are you sure you want to delete this product?\')">Delete</a>';
-        echo '</td>';
-        echo '</tr>';
-    }
-    echo '</tbody>';
-    echo '</table>';
-    echo '</div>';
-    }
+        echo '<table class="wp-list-table widefat fixed striped">';
+        echo '<thead><tr><th>SKU</th><th>Name</th><th>Description</th><th>Category</th><th>Price</th><th>Quantity</th><th>Actions</th></tr></thead>';
+        echo '<tbody>';
+        foreach ($products as $product) {
+            echo '<tr>';
+            echo '<td>' . esc_html($product->sku) . '</td>';
+            echo '<td>' . esc_html($product->name) . '</td>';
+            echo '<td>' . esc_html($product->description) . '</td>';
+            echo '<td>' . esc_html($product->category) . '</td>';
+            echo '<td>' . esc_html($product->price) . '</td>';
+            echo '<td>' . esc_html($product->quantity) . '</td>';
+            echo '<td>';
+            echo '<a href="' . admin_url('admin.php?page=product-management&action=edit&id=' . esc_attr($product->id)) . '">Edit</a> | ';
+            echo '<a href="' . wp_nonce_url(admin_url('admin-post.php?action=delete_product&id=' . esc_attr($product->id)), 'delete_product_action', 'delete_product_nonce') . '" onclick="return confirm(\'Are you sure you want to delete this product?\')">Delete</a>';
+            echo '</td>';
+            echo '</tr>';
+        }
+        echo '</tbody>';
+        echo '</table>';
+        echo '</div>';
+        }
 }

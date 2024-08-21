@@ -97,3 +97,151 @@ button:hover {
     line-height: 1;
 }
 
+/* POS Page Css */
+.pos-container {
+    max-width: 90%;
+    margin: 10% auto;
+    background-color: #fff;
+    padding: 20px;
+    border-radius: 8px;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+}
+
+.pos-header {
+    text-align: center;
+    margin-bottom: 20px;
+}
+
+.pos-body {
+    display: flex;
+    justify-content: space-between;
+}
+
+.product-section{
+    width: 70%;
+}
+
+.summary-section {
+    width: 28%;
+}
+
+.product-search {
+    display: block;
+    margin-bottom: 20px;
+}
+
+.product-search input[type="text"] {
+    flex: unset;
+    padding: 10px;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+    margin-right: 10px;
+}
+
+.product-search button {
+    padding: 10px 20px;
+    background-color: #28a745;
+    color: white;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    display: none !important;
+}
+
+.product-search button:hover {
+    background-color: #218838;
+}
+
+.cart {
+    margin-bottom: 20px;
+}
+
+.cart table {
+    width: 100%;
+    border-collapse: collapse;
+}
+
+.cart th, .cart td {
+    padding: 10px;
+    text-align: left;
+    border-bottom: 1px solid #ddd;
+}
+
+.summary {
+    margin-bottom: 20px;
+}
+
+.summary p {
+    font-size: 16px;
+    margin: 10px 0;
+}
+
+.summary input[type="number"] {
+    width: 60px;
+    padding: 5px;
+    margin-left: 10px;
+}
+
+.payment-method select {
+    width: 100%;
+    padding: 10px;
+    margin-bottom: 20px;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+}
+
+button {
+    width: 100%;
+    padding: 10px;
+    background-color: #007bff;
+    color: white;
+    border: none;
+    border-radius: 4px;
+    font-size: 16px;
+    cursor: pointer;
+}
+
+button:hover {
+    background-color: #0056b3;
+}
+
+/*
+	Inovice
+*/
+
+#invoice {
+    max-width: 600px;
+    margin: 20px auto;
+    background-color: #fff;
+    padding: 20px;
+    border-radius: 8px;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+}
+
+#invoice table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-bottom: 20px;
+}
+
+#invoice th, #invoice td {
+    padding: 10px;
+    text-align: left;
+    border-bottom: 1px solid #ddd;
+}
+
+#invoice button {
+    width: 100%;
+    padding: 10px;
+    background-color: #007bff;
+    color: white;
+    border: none;
+    border-radius: 4px;
+    font-size: 16px;
+    cursor: pointer;
+}
+
+#invoice button:hover {
+    background-color: #0056b3;
+}
+

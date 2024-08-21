@@ -1,7 +1,16 @@
 <?php
 namespace Inc\Admin;
 
+// Hook into WordPress AJAX
+// add_action('wp_ajax_search_product', [ProductHandler::class, 'search_product']);
+// add_action('wp_ajax_nopriv_search_product', [ProductHandler::class, 'search_product']);
+
 class ProductHandler {
+
+    public function register_hooks() {
+        add_action('wp_ajax_search_product', [ $this, 'search_product']);
+        add_action('wp_ajax_nopriv_search_product', [ $this, 'search_product']);
+    }
 
     public static function register_product() {
         error_log('Form submitted.'); // Check if this gets logged
@@ -108,9 +117,8 @@ class ProductHandler {
         }
     }
 
-
-        // Image Upload Helper Function
-        private static function upload_images($files) {
+    // Image Upload Helper Function
+    private static function upload_images($files) {
             require_once(ABSPATH . 'wp-admin/includes/file.php');
             require_once(ABSPATH . 'wp-admin/includes/image.php');
             require_once(ABSPATH . 'wp-admin/includes/media.php');
@@ -140,6 +148,48 @@ class ProductHandler {
             }
     
             return implode(',', $uploaded_urls);
-        }
+    }
+
+    public function search_product() {
+
+        // Log incoming data for debugging
+        // error_log('AJAX request received');
+        error_log(print_r($_POST, true));
+        
+            global $wpdb;
+
+            // Check for nonce first.
+            if (!isset($_POST['nonce']) || !wp_verify_nonce($_POST['nonce'], 'search_product_nonce')) {
+                wp_send_json_error('Nonce verification failed');
+                wp_die();
+            }
+
+            // Validate presence of the query.
+            if (empty($_POST['query'])) {
+                wp_send_json_error('No query provided');
+                wp_die();
+            }
+
+
+            $search_query = sanitize_text_field($_POST['query']);
+            $table_name = $wpdb->prefix . 'mt_products'; // Replace with your actual product table name
+
+            $products = $wpdb->get_results($wpdb->prepare(
+                "SELECT * FROM $table_name WHERE sku LIKE %s OR name LIKE %s",
+                '%' . $wpdb->esc_like($search_query) . '%',
+                '%' . $wpdb->esc_like($search_query) . '%'
+            ));
+        
+            if ($products) {
+                wp_send_json_success($products);
+            } else {
+                wp_send_json_error('No products found');
+            }
+        
+            wp_die();
+
+    }
+
+    
 
 }

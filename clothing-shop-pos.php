@@ -35,4 +35,6 @@ function run_clothing_shop_pos() {
 add_action('plugins_loaded', 'run_clothing_shop_pos');
 
 register_activation_hook(__FILE__, array('Inc\Core\Activator', 'activate'));
+register_deactivation_hook(__FILE__, array('Inc\Core\Deactivator', 'deactivate'));
+register_uninstall_hook( __FILE__, array('Inc\Core\Uninstall', 'plugin_Uninstall') );
 
