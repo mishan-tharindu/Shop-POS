@@ -10,54 +10,98 @@ class ProductHandler {
     public function register_hooks() {
         add_action('wp_ajax_search_product', [ $this, 'search_product']);
         add_action('wp_ajax_nopriv_search_product', [ $this, 'search_product']);
+
+        // add_action('admin_post_registor_main_category', array($this, 'registor_main_category'));
     }
 
     public static function register_product() {
-        error_log('Form submitted.'); // Check if this gets logged
+            // Security check
         if (!isset($_POST['register_product_nonce']) || !wp_verify_nonce($_POST['register_product_nonce'], 'register_product_action')) {
             wp_die('Security check failed');
         }
 
-        error_log('Nonce passed.'); // Check if nonce checking passes
-    
-        if (isset($_POST['productName'])) {
-            global $wpdb;
-            $table_name = $wpdb->prefix . 'mt_products';
-                
-            // Sanitize and prepare data
-            $data = [
-                'sku' => sanitize_text_field($_POST['sku']),
-                'name' => sanitize_text_field($_POST['productName']),
-                'description' => sanitize_textarea_field($_POST['description']),
-                'category' => sanitize_text_field($_POST['category']),
-                'price' => sanitize_text_field($_POST['price']),
-                'quantity' => intval($_POST['quantity']),
-                'supplier' => sanitize_text_field($_POST['supplier']),
-                // Add other fields as necessary
-            ];
+        global $wpdb;
+        $table_products = $wpdb->prefix . 'mt_products';
+        $table_product_stock = $wpdb->prefix . 'mt_product_stock';
 
-                    // Handle file uploads
-            if (!empty($_FILES['productImages']['name'][0])) {
-                $data['images'] = self::upload_images($_FILES['productImages']);
+        // Sanitize and prepare data
+        $product_name = sanitize_text_field($_POST['productName']);
+        $sku = sanitize_text_field($_POST['sku']);
+        $description = sanitize_textarea_field($_POST['description']);
+        $category_id = intval($_POST['category']);
+        $price = sanitize_text_field($_POST['price']);
+        $quantity = intval($_POST['quantity']);
+
+        // Insert product into mt_products table
+        $product_inserted = $wpdb->insert(
+            $table_products,
+            [
+                'product_name' => $product_name,
+                'discription' => $description,
+                'idsub_category' => $category_id
+            ],
+            ['%s', '%s', '%d']
+        );
+
+        $product_id = $wpdb->insert_id;
+
+        // Insert stock information into mt_product_stock table
+        if ($product_inserted) {
+            $wpdb->insert(
+                $table_product_stock,
+                [
+                    'sku' => $sku,
+                    'qty' => $quantity,
+                    'selling_price' => $price,
+                    'idproducts' => $product_id
+                ],
+                ['%s', '%d', '%s', '%d']
+            );
+        }
+
+        // Handle file uploads for product images
+        if (!function_exists('wp_handle_upload')) {
+            require_once(ABSPATH . 'wp-admin/includes/file.php');
+        }
+
+        $uploaded_images = [];
+        foreach ($_FILES['productImages']['name'] as $key => $value) {
+            if ($_FILES['productImages']['name'][$key]) {
+                $file = [
+                    'name'     => $_FILES['productImages']['name'][$key],
+                    'type'     => $_FILES['productImages']['type'][$key],
+                    'tmp_name' => $_FILES['productImages']['tmp_name'][$key],
+                    'error'    => $_FILES['productImages']['error'][$key],
+                    'size'     => $_FILES['productImages']['size'][$key]
+                ];
+                $upload_overrides = ['test_form' => false];
+                $movefile = wp_handle_upload($file, $upload_overrides);
+
+                if ($movefile && !isset($movefile['error'])) {
+                    $uploaded_images[] = $movefile['url'];
+                } else {
+                    // Handle error case
+                }
             }
-    
-            // Insert product data into the database
-            $inserted = $wpdb->insert($table_name, $data);
-            if ($inserted) {
-                // echo '<div id="successMessage">Product "' . esc_html($data['name']) . '" registered successfully!</div>';
-                // Redirect back to the same page with a success message
-                $redirect_url = add_query_arg(array(
-                    'page' => 'product-management', // Make sure this matches the actual slug of your product registration page
-                    'status' => 'success' // This query parameter is used to show the success message
-                ), admin_url('admin.php'));
+        }
 
-                wp_redirect($redirect_url);
-                exit;
+        // Update the product record with images if applicable
+        if (!empty($uploaded_images)) {
+            $wpdb->update(
+                $table_products,
+                ['images' => implode(',', $uploaded_images)],
+                ['idproducts' => $product_id],
+                ['%s'],
+                ['%d']
+            );
+        }
 
-            } else {
-                echo '<div id="errorMessage">Failed to register product.</div>';
-            }
-
+        if ($product_inserted) {
+            wp_redirect(admin_url('admin.php?page=product-management&status=success'));
+            exit;
+        } else {
+            wp_redirect(admin_url('admin.php?page=product-management&status=error'));
+            exit;
         }
     }
 
@@ -65,89 +109,105 @@ class ProductHandler {
         if (!isset($_GET['delete_product_nonce']) || !wp_verify_nonce($_GET['delete_product_nonce'], 'delete_product_action')) {
             wp_die('Security check failed');
         }
-
+    
         if (isset($_GET['id'])) {
             global $wpdb;
-            $table_name = $wpdb->prefix . 'mt_products';
-            $wpdb->delete($table_name, array('id' => intval($_GET['id'])));
+            $product_id = intval($_GET['id']);
+            
+            $table_products = $wpdb->prefix . 'mt_products';
+            $table_product_stock = $wpdb->prefix . 'mt_product_stock';
+    
+            // Delete product stock entries first to maintain referential integrity
+            $wpdb->delete($table_product_stock, ['idproducts' => $product_id]);  // Assuming 'idproducts' is the foreign key in mt_product_stock table
+            
+            // Then delete the product entry
+            $wpdb->delete($table_products, ['idproducts' => $product_id]);
+            
             wp_redirect(add_query_arg('status', 'deleted', admin_url('admin.php?page=product-management')));
             exit;
         }
     }
+    
 
     public static function update_product() {
         if (!isset($_POST['register_product_nonce']) || !wp_verify_nonce($_POST['register_product_nonce'], 'register_product_action')) {
             wp_die('Security check failed');
         }
-
+    
         if (isset($_POST['product_id']) && !empty($_POST['product_id'])) {
             global $wpdb;
-            $table_name = $wpdb->prefix . 'mt_products';
-
-            // Prepare updated data
-            $data = [
-                'sku' => sanitize_text_field($_POST['sku']),
-                'name' => sanitize_text_field($_POST['productName']),
-                'description' => sanitize_textarea_field($_POST['description']),
-                'category' => sanitize_text_field($_POST['category']),
-                'price' => sanitize_text_field($_POST['price']),
-                'quantity' => intval($_POST['quantity']),
-                'supplier' => sanitize_text_field($_POST['supplier']),
+            $table_products = $wpdb->prefix . 'mt_products';
+            $table_product_stock = $wpdb->prefix . 'mt_product_stock';
+    
+            // Product and Stock IDs
+            $product_id = intval($_POST['product_id']);
+            $product_stock_id = intval($_POST['product_stock_id']);
+    
+            // Update mt_products table
+            $product_data = [
+                'product_name' => sanitize_text_field($_POST['productName']),
+                'discription' => sanitize_textarea_field($_POST['description']),
+                'idsub_category' => intval($_POST['category'])
             ];
-
+            
+            $wpdb->update($table_products, $product_data, ['idproducts' => $product_id]);
+    
+            // Update mt_product_stock table
+            $stock_data = [
+                'sku' => sanitize_text_field($_POST['sku']),
+                'qty' => intval($_POST['quantity']),
+                'selling_price' => sanitize_text_field($_POST['price'])
+            ];
+    
+            $wpdb->update($table_product_stock, $stock_data, ['idproduct_stock' => $product_stock_id]);
+    
             // Handle existing images
             $existing_images = isset($_POST['existing_images']) ? $_POST['existing_images'] : [];
             $removed_images = isset($_POST['remove_images']) ? $_POST['remove_images'] : [];
             $images_array = array_diff($existing_images, $removed_images);
-
+    
             // Handle new uploads (append to existing images)
             if (!empty($_FILES['productImages']['name'][0])) {
                 $new_images = self::upload_images($_FILES['productImages']);
                 $images_array = array_merge($images_array, explode(',', $new_images));
             }
-
-            // Update images field
-            $data['images'] = implode(',', $images_array);
-
-            // Update the product in the database
-            $wpdb->update($table_name, $data, ['id' => intval($_POST['product_id'])]);
-
+    
+            // Update images in mt_products
+            $images_data = ['images' => implode(',', $images_array)];
+            $wpdb->update($table_products, $images_data, ['idproducts' => $product_id]);
+    
             wp_redirect(add_query_arg('status', 'updated', admin_url('admin.php?page=product-management')));
             exit;
         }
     }
-
-    // Image Upload Helper Function
+    
     private static function upload_images($files) {
+        if (!function_exists('wp_handle_upload')) {
             require_once(ABSPATH . 'wp-admin/includes/file.php');
-            require_once(ABSPATH . 'wp-admin/includes/image.php');
-            require_once(ABSPATH . 'wp-admin/includes/media.php');
+        }
     
-            $uploaded_urls = [];
+        $uploaded_images = [];
+        foreach ($files['name'] as $key => $value) {
+            if ($files['name'][$key]) {
+                $file = [
+                    'name'     => $files['name'][$key],
+                    'type'     => $files['type'][$key],
+                    'tmp_name' => $files['tmp_name'][$key],
+                    'error'    => $files['error'][$key],
+                    'size'     => $files['size'][$key]
+                ];
+                $upload_overrides = ['test_form' => false];
+                $movefile = wp_handle_upload($file, $upload_overrides);
     
-            foreach ($files['name'] as $key => $value) {
-                if ($files['name'][$key]) {
-                    $file = array(
-                        'name'     => $files['name'][$key],
-                        'type'     => $files['type'][$key],
-                        'tmp_name' => $files['tmp_name'][$key],
-                        'error'    => $files['error'][$key],
-                        'size'     => $files['size'][$key]
-                    );
-    
-                    $_FILES = array("product_image" => $file);
-    
-                    $attachment_id = media_handle_upload("product_image", 0);
-    
-                    if (is_wp_error($attachment_id)) {
-                        continue;
-                    } else {
-                        $uploaded_urls[] = wp_get_attachment_url($attachment_id);
-                    }
+                if ($movefile && !isset($movefile['error'])) {
+                    $uploaded_images[] = $movefile['url'];
+                } else {
+                    // Handle error case
+                    // Optionally log the error or handle it as needed
                 }
             }
-    
-            return implode(',', $uploaded_urls);
+        }
+        return implode(',', $uploaded_images);
     }
 
     public function search_product() {
@@ -189,6 +249,95 @@ class ProductHandler {
             wp_die();
 
     }
+
+    public static function register_main_category() {
+        if (!isset($_POST['register_category_nonce']) || !wp_verify_nonce($_POST['register_category_nonce'], 'register_category_action')) {
+            wp_die('Security check failed');
+            error_log('Nonce Failed.');
+        }
+
+        error_log('Nonce passed.');
+
+        global $wpdb;
+        $parent_id = sanitize_text_field($_POST['parent']);
+        $category_name = sanitize_text_field($_POST['tag-name']);
+        $category_slug = sanitize_title($category_name); // Generates a URL-friendly slug
+
+        if ($parent_id == '-1') {
+            error_log('Main Category section !!!');
+            // It's a main category
+            $table = $wpdb->prefix . 'mt_main_category';
+            $inserted = $wpdb->insert(
+                $table,
+                [
+                    'main_cat_name' => $category_name,
+                    'main_cat_slug' => $category_slug
+                ],
+                ['%s', '%s']
+            );
+        } else {
+            // It's a sub category
+            error_log('Sub Category section !!!');
+            $table = $wpdb->prefix . 'mt_sub_category';
+            $inserted = $wpdb->insert(
+                $table,
+                [
+                    'sub_cat_name' => $category_name,
+                    'sub_cat_slug' => $category_slug,
+                    'idmain_category' => $parent_id
+                ],
+                ['%s', '%s', '%d']
+            );
+        }
+
+        if ($inserted) {
+            // Redirect back to the same page with a success message
+            $redirect_url = add_query_arg(array(
+                'page' => 'category-menu', // Ensure this matches your menu slug
+                'status' => 'success'
+            ), admin_url('admin.php'));
+
+            wp_redirect($redirect_url);
+            exit;
+
+        } else {
+            $redirect_url = add_query_arg(array(
+                'page' => 'category-menu', // Ensure this matches your menu slug
+                'status' => 'error'
+            ), admin_url('admin.php'));
+
+            wp_redirect($redirect_url);
+            exit;
+            
+        }
+    }
+
+    public function edit_category() {
+        if (!isset($_GET['id']) || !isset($_GET['type'])) {
+            wp_die('Category not specified');
+        }
+
+        $id = intval($_GET['id']);
+        $type = sanitize_text_field($_GET['type']);
+        global $wpdb;
+        if ($type == 'main') {
+            $table = $wpdb->prefix . 'mt_main_category';
+            $category = $wpdb->get_row($wpdb->prepare("SELECT * FROM $table WHERE idmain_category = %d", $id));
+        } else {
+            $table = $wpdb->prefix . 'mt_sub_category';
+            $category = $wpdb->get_row($wpdb->prepare("SELECT * FROM $table WHERE idsub_category = %d", $id));
+        }
+
+        // // Assume we are in an admin form where `admin_url('admin-post.php')` is the action
+        // echo "<form method='post' action='".admin_url("admin-post.php")."'>
+        //     <input type='hidden' name='action' value='update_category'>
+        //     <input type='hidden' name='category_id' value='{$id}'>
+        //     <input type='hidden' name='category_type' value='{$type}'>
+        //     <input type='text' name='name' value='{$category->main_cat_name ?? $category->sub_cat_name}'>
+        //     <input type='text' name='slug' value='{$category->main_cat_slug ?? $category->sub_cat_slug}'>
+        //     <input type='submit' value='Update Category'>
+        // </form>";
+}
 
     
 

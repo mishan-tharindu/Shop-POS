@@ -6,10 +6,12 @@ class Admin {
 
     private $productPage;
     private $pospage;
+    private $categoryPage;
 
     public function __construct() {
         $this->productPage = new ProductPage();
         $this->posPage = new PosPage();
+        $this->categoryPage = new CategoryPage();
     }
 
     public function hooks() {
@@ -24,6 +26,7 @@ class Admin {
         add_action('admin_post_register_product', array('Inc\Admin\ProductHandler', 'register_product'));
         add_action('admin_post_delete_product', array('Inc\Admin\ProductHandler', 'delete_product'));
         add_action('admin_post_update_product', array('Inc\Admin\ProductHandler', 'update_product'));
+        add_action('admin_post_save_category', ['Inc\Admin\ProductHandler', 'register_main_category']);
         
 
 
@@ -35,11 +38,19 @@ class Admin {
 
         add_submenu_page(
             'clothing-shop-pos',        // The slug of the parent page
-            'My Custom Submenu',        // The title of the submenu page
-            'Submenu',                  // The menu title
+            'POS',        // The title of the submenu page
+            'Pos Menu',                  // The menu title
             'manage_options',           // The capability required for this menu to be displayed to the user
-            'my-custom-submenu-slug',   // The slug by which this submenu will be identified
+            'pos-menu',   // The slug by which this submenu will be identified
             array($this->posPage, 'display') // The function to call to display the submenu page content
+        );
+        add_submenu_page(
+            'clothing-shop-pos',        // The slug of the parent page
+            'Category',        // The title of the submenu page
+            'Category',                  // The menu title
+            'manage_options',           // The capability required for this menu to be displayed to the user
+            'category-menu',   // The slug by which this submenu will be identified
+            array($this->categoryPage, 'view_category_page') // The function to call to display the submenu page content
         );
 
     }
@@ -61,12 +72,6 @@ class Admin {
 
     }
 
-    public function my_custom_submenu_page_callback() {
-        echo '<div class="wrap">';
-        echo '<h1>My Custom Submenu Page</h1>';
-        echo '<p>Welcome to your new sub-admin page.</p>';
-        echo '</div>';
-    }
 
     
 }

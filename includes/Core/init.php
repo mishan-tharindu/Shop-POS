@@ -26,7 +26,6 @@ class Init {
         $this->defineAdminHooks();
         $this->definePublicHooks();
         $this->defineProductHandlerHooks();
-        // $this->installDatabaseHandlerHooks();
     }
 
 
@@ -49,10 +48,5 @@ class Init {
         $productHandler = new ProductHandler();
         $productHandler->register_hooks();
     }
-
-    // private function installDatabaseHandlerHooks(){
-    //     $installDatabaseHanlder = new DatabaseInstall();
-    //     $installDatabaseHanlder -> database_install();
-    // }
 
 }

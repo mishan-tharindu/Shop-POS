@@ -4,7 +4,7 @@ namespace Inc\Core;
 
 class DatabaseInstall{
 
-    public static function database_install(){
+    public function database_install(){
         global $wpdb;
 
         // Database Table

@@ -4,9 +4,12 @@ namespace Inc\Core;
 
 class Activator {
 
-    public function activator(){
+    public function __construct() {
+        error_log('Check: Activator Constructer !!! ' );
+    }
 
-        $this->installDatabaseHandlerHooks();
+    public function activator(){
+        error_log('Check: Activator Constructer !!! ' );
 
     }
 
@@ -14,9 +17,12 @@ class Activator {
         error_log('Check: Plugin Active' );
         // Code to run during activation
         // For example, setting default options or creating custom database tables
+
+        self::setup_database();
+
     }
 
-    private function installDatabaseHandlerHooks(){
+    public static function setup_database(){
         $installDatabaseHanlder = new DatabaseInstall();
         $installDatabaseHanlder -> database_install();
     }
