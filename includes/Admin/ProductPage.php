@@ -142,14 +142,13 @@ SELECT p.idproducts, p.product_name, p.discription, p.size, ps.sku, ps.qty, ps.s
         }
 
         echo '<table class="wp-list-table widefat fixed striped">';
-        echo '<thead><tr><th>SKU</th><th>Name</th><th>Size</th><th>Description</th><th>Category</th><th>Price</th><th>Quantity</th><th>Actions</th></tr></thead>';
+        echo '<thead><tr><th>SKU</th><th>Name</th><th>Size</th><th>Category</th><th>Price</th><th>Quantity</th><th>Actions</th></tr></thead>';
         echo '<tbody>';
         foreach ($products as $product) {
             echo '<tr>';
             echo '<td>' . esc_html($product->sku) . '</td>';
             echo '<td>' . esc_html($product->product_name) . '</td>';
             echo '<td>' . esc_html($product->size) . '</td>';
-            echo '<td>' . esc_html($product->discription) . '</td>';
             echo '<td>' . esc_html($product->sub_cat_name) . '</td>';
             echo '<td>' . esc_html($product->selling_price) . '</td>';
             echo '<td>' . esc_html($product->qty) . '</td>';

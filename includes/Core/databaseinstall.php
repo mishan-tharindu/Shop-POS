@@ -21,6 +21,7 @@ class DatabaseInstall{
         $table_return_inv_products =  $wpdb->prefix .'mt_return_inv_products';
         $table_return_grn =  $wpdb->prefix .'mt_return_grn';
         $table_return_grn_products =  $wpdb->prefix .'mt_return_grn_products';
+        $table_invoice_products =  $wpdb->prefix .'mt_invoice_products';
 
         $charset_collate = $wpdb->get_charset_collate();
 
@@ -94,15 +95,12 @@ class DatabaseInstall{
                 `idinvoice` VARCHAR(255) NOT NULL,
                 `date` DATE NULL,
                 `time` TIME NULL,
-                `qty` INT NULL,
                 `discount` VARCHAR(45) NULL,
                 `status` INT NULL,
                 `payment_type` VARCHAR(45) NULL,
                 `payment` VARCHAR(45) NULL,
-                `idproduct_stock` INT,
-                `idcustomers` INT,
+                `idcustomers` INT NULL,
                 PRIMARY KEY(`idinvoice`),
-                FOREIGN KEY(`idproduct_stock`) REFERENCES $table_product_stock(`idproduct_stock`),
                 FOREIGN KEY(`idcustomers`) REFERENCES $table_customer(`idcustomers`)
             ); CREATE TABLE $table_return_invoice(
                 `idreturn_invoice` VARCHAR(255) NOT NULL,
@@ -140,6 +138,13 @@ class DatabaseInstall{
                     PRIMARY KEY(`idreturn_grn_products`),
                     FOREIGN KEY(`idreturn_grn`) REFERENCES $table_return_grn(`idreturn_grn`),
                     FOREIGN KEY(`idproduct_stock`) REFERENCES $table_product_stock(`idproduct_stock`)
+            ); CREATE TABLE $table_invoice_products(
+                    `idinvoice_products` INT NOT NULL AUTO_INCREMENT,
+                    `qty` INT NULL,
+                    `sku` VARCHAR(255) NULL,
+                    `idinvoice` VARCHAR(255),
+                    PRIMARY KEY(`idinvoice_products`),
+                    FOREIGN KEY(`idinvoice`) REFERENCES $table_invoice(`idinvoice`)
             );";
 
         require_once(ABSPATH . 'wp-admin/includes/upgrade.php');

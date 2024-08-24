@@ -249,3 +249,14 @@ button:hover {
     font-size: 18px;
     font-weight: 600;
 }
+
+.result-item {
+    padding: 15px;
+    font-size: 14px;
+    font-weight: 400;
+}
+
+.result-item:hover {
+    background-color: #66B0FF;
+    color: white;
+}

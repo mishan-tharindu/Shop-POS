@@ -39,10 +39,11 @@ class Deactivator {
         $table_return_inv_products =  $wpdb->prefix .'mt_return_inv_products';
         $table_return_grn =  $wpdb->prefix .'mt_return_grn';
         $table_return_grn_products =  $wpdb->prefix .'mt_return_grn_products';
+        $table_invoice_products =  $wpdb->prefix .'mt_invoice_products';
 
         $tables = [
             $table_customer, $table_supplier, $table_users, $table_main_category, $table_sub_category, $table_products, $table_grn, $table_product_stock, $table_invoice,
-            $table_return_invoice, $table_return_inv_products, $table_return_grn, $table_return_grn_products
+            $table_return_invoice, $table_return_inv_products, $table_return_grn, $table_return_grn_products, $table_invoice_products
         ];
     
         foreach ($tables as $table) {

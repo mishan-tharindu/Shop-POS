@@ -169,6 +169,11 @@ function finalizeSale() {
         
                 // Get all rows from the source table
                 const rows = sourceTable.getElementsByTagName('tr');
+
+                const invoiceID = generateInvoiceNumber();
+
+                let totalQty = 0;
+                const cartItems = [];
         
                 // Loop through each row (skipping the header row)
                 for (let i = 1; i < rows.length; i++) {
@@ -182,6 +187,16 @@ function finalizeSale() {
         
                         // Append the modified row to the destination table
                         destinationTable.appendChild(newRow);
+
+                        //Add Cart Items
+                        const qty = parseInt(cells[2].textContent);
+                        totalQty += qty;
+            
+                        cartItems.push({
+                            sku: rows[i].getAttribute('data-sku'),
+                            quantity: parseInt(cells[1].textContent),
+                            price: parseFloat(cells[3].textContent.replace('Rs.', '').trim())
+                        });
                     }
                 }
                 
@@ -196,38 +211,45 @@ function finalizeSale() {
     document.getElementById('invoiceTax').innerText = document.getElementById('tax').innerText;
     document.getElementById('invoiceDiscount').innerText = document.getElementById('discount').value;
 
-    // Show the invoice
-    document.getElementById('invoice').style.display = 'block';
-    const cartTables = document.getElementById('cartTable').getElementsByTagName('tbody')[0];
-    cartTables.innerHTML = ''; // Clear existing items
 
 
-    // Print the invoice
-    printInvoice();
+    const invoiceData = {
+        invoiceId: invoiceID,
+        qty: totalQty,
+        discount: parseFloat(document.getElementById('discount').value) || 0,
+        paymentMethod: document.getElementById('paymentMethod').value,
+        subtotal: parseFloat(document.getElementById('subtotal').textContent) || 0,
+        tax: parseFloat(document.getElementById('tax').textContent) || 0,
+        total: parseFloat(document.getElementById('total').textContent) || 0,
+        cartItems: cartItems
+    };
+
+
+    console.log("JASON Object :: "+JSON.stringify(invoiceData));
+
+    const xhr = new XMLHttpRequest();
+    xhr.open('POST', ajax_object.ajax_url, true);
+    xhr.setRequestHeader('Content-Type', 'application/x-www-form-urlencoded');
+    xhr.onreadystatechange = function() {
+        if (xhr.readyState === 4 && xhr.status === 200) {
+            console.log('Invoice saved successfully.');
+            // Show the invoice
+            document.getElementById('invoice').style.display = 'block';
+            const cartTables = document.getElementById('cartTable').getElementsByTagName('tbody')[0];
+            cartTables.innerHTML = ''; // Clear existing items
+            printInvoice();
+        }
+    };
+
+    const params = `action=save_invoice&nonce=${ajax_object.nonce}&invoiceData=${encodeURIComponent(JSON.stringify(invoiceData))}`;
+    xhr.send(params);
+
+
+
+    
 }
 
 function printInvoice() {
-    // window.print(); // Trigger the print dialog
-    // document.getElementById('invoice').print();
-    // document.getElementById('invoice').style.display = 'none'; // Optionally hide the invoice again after printing
-
-    // var invoiceContent = document.getElementById('invoice').innerHTML;
-    // var originalContent = document.body.innerHTML;
-
-    // document.body.innerHTML = invoiceContent;
-    // window.print();
-    // document.body.innerHTML = originalContent;
-
-
-    // const printWindow = window.open('', '', 'height=500,width=800');
-    // printWindow.document.write('<html><head><title>Invoice</title>');
-    // printWindow.document.write('</head><body >');
-    // printWindow.document.write(document.getElementById('invoice').outerHTML);
-    // printWindow.document.write('</body></html>');
-    // printWindow.document.close();
-    // printWindow.print();
-
-    // // 2nd way
 
     const printWindow = window.open('', '', 'height=500,width=800');
     printWindow.document.write('<html><head><title>Invoice</title>');
@@ -240,7 +262,11 @@ function printInvoice() {
     printWindow.document.write(document.getElementById('invoice').outerHTML);
     printWindow.document.write('</body></html>');
     printWindow.document.close();
+    printWindow.focus();
     printWindow.print();
+    printWindow.close();
+
+    location.reload();
 
   }
 
@@ -262,57 +288,6 @@ function printInvoice() {
     });
 });
 
-function saveInvoice() {
-    const invoiceTableBody = document.getElementById('invoiceTable').getElementsByTagName('tbody')[0];
-    const sourceTableRows = document.getElementById('cartTable').getElementsByTagName('tr');
-
-    let totalQty = 0;
-    const cartItems = [];
-    const invoiceID = generateInvoiceNumber();
-
-    for (let i = 1; i < sourceTableRows.length; i++) {
-        const cells = sourceTableRows[i].getElementsByTagName('td');
-        if (cells.length > 0) {
-            const newRow = sourceTableRows[i].cloneNode(true);
-            newRow.removeChild(newRow.lastChild); // Remove the 'Remove' button cell
-            invoiceTableBody.appendChild(newRow);
-
-            const qty = parseInt(cells[2].textContent);
-            totalQty += qty;
-
-            cartItems.push({
-                sku: cells[0].textContent.trim(),
-                quantity: qty,
-                price: parseFloat(cells[3].textContent.replace('Rs.', '').trim())
-            });
-        }
-    }
-
-    const invoiceData = {
-        invoiceId: invoiceID,
-        qty: totalQty,
-        discount: parseFloat(document.getElementById('discount').value) || 0,
-        paymentMethod: document.getElementById('paymentMethod').value,
-        subtotal: parseFloat(document.getElementById('subtotal').textContent) || 0,
-        tax: parseFloat(document.getElementById('tax').textContent) || 0,
-        total: parseFloat(document.getElementById('total').textContent) || 0,
-        cartItems: cartItems
-    };
-
-    const xhr = new XMLHttpRequest();
-    xhr.open('POST', ajax_object.ajax_url, true);
-    xhr.setRequestHeader('Content-Type', 'application/x-www-form-urlencoded');
-    xhr.onreadystatechange = function() {
-        if (xhr.readyState === 4 && xhr.status === 200) {
-            console.log('Invoice saved successfully.');
-            document.getElementById('invoice').style.display = 'block';
-            printInvoice();
-        }
-    };
-
-    const params = `action=save_invoice&nonce=${ajax_object.nonce}&invoiceData=${encodeURIComponent(JSON.stringify(invoiceData))}`;
-    xhr.send(params);
-}
 
 // Generate a unique invoice number
 function generateInvoiceNumber() {
@@ -326,16 +301,18 @@ function generateInvoiceNumber() {
     return `INC${year}${month}${day}${hours}${minutes}${seconds}`;
 }
 
-// function changeCashBalance() {
-//      // console.log("Press Cash Field !!");
-//      billtotal = parseFloat(document.getElementById('total').textContent);
-//      cashInput = parseFloat(document.getElementById('cashbalance').value);
+document.getElementById('cancelButton').addEventListener('click', function() {
+    // Redirect to the POS menu page
+    window.location.href = 'admin.php?page=pos-menu';
+});
 
-//      console.log("billtotal ::: "+billtotal+"  Cash input ::: "+cashInput);
+// function printInvoice() {
+//     window.print();
 
-//      cashbalance = cashInput - billtotal;
-//      console.log("cashbalance ::: "+cashbalance);
-
-//      document.getElementById("cash-balance").innerHTML = cashbalance;
+//     // Optionally redirect immediately after printing
+//     setTimeout(function() {
+//         window.location.href = 'admin.php?page=pos-menu';
+//     }, 1000);
 // }
+
 

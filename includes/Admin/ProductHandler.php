@@ -41,7 +41,7 @@ class ProductHandler {
             $table_products,
             [
                 'product_name' => $product_name,
-                'discription' => $size,
+                'size' => $size,
                 'idsub_category' => $category_id
             ],
             ['%s', '%s', '%d']
@@ -344,37 +344,71 @@ class ProductHandler {
     }
 
     function save_invoice() {
-        // check_ajax_referer('your_nonce_action', 'nonce');
-    
         if (isset($_POST['invoiceData'])) {
             global $wpdb;
     
+            // Decode the invoice data
             $invoiceData = json_decode(stripslashes($_POST['invoiceData']), true);
-            $invoiceNumber = generate_invoice_number(); // Function to generate unique invoice number
-    
+            
             // Get the current date and time
             $date = current_time('Y-m-d');
             $time = current_time('H:i:s');
     
-            // Insert into the invoice table
+            $cartItems = $invoiceData['cartItems']; // Array of cart items
+    
+            // Define table names
             $table_invoice = $wpdb->prefix . 'mt_invoice';
+            $table_product_stock = $wpdb->prefix . 'mt_product_stock';
+            $table_invoice_product = $wpdb->prefix . 'mt_invoice_products';
+    
+            // Insert invoice data
             $inserted = $wpdb->insert(
                 $table_invoice,
                 array(
                     'idinvoice' => $invoiceData['invoiceId'],
                     'date' => $date,
                     'time' => $time,
-                    'qty' => $invoiceData['qty'],
-                    'discount' => $invoiceData['discount'],
+                    'discount' => ($invoiceData['discount']),
                     'status' => 1, // Assuming 1 means 'paid' or 'active'
-                    'payment' => $invoiceData['paymentMethod'],
-                    'idproduct_stock' => '', // Replace this with the actual product stock ID
-                    'idcustomers' => '' // Replace this with the actual customer ID if needed
+                    'payment_type' => sanitize_text_field($invoiceData['paymentMethod']),
+                    'payment' => floatval($invoiceData['total'])
                 ),
-                array('%s', '%s', '%s', '%d', '%f', '%d', '%s', '%d', '%d')
+                array('%s', '%s', '%s', '%s', '%d', '%s', '%s')
             );
     
             if ($inserted) {
+                // Loop through each product in the cart
+                foreach ($cartItems as $product) {
+                    $product_sku = sanitize_text_field($product['sku']); // SKU is likely a string
+                    $quantity_sold = intval($product['quantity']);
+                    $selling_price = floatval($product['price']);
+    
+                    // Update the stock quantity for each product
+                    $updated = $wpdb->query(
+                        $wpdb->prepare(
+                            "UPDATE $table_product_stock SET qty = qty - %d WHERE sku = %s",
+                            $quantity_sold,
+                            $product_sku
+                        )
+                    );
+    
+                    // Log the query result for debugging
+                    // error_log('Updated rows: ' . $wpdb->rows_affected);
+    
+                    if ($updated !== false) {
+                        // Insert the product into invoice_products table
+                        $wpdb->insert(
+                            $table_invoice_product,
+                            array(
+                                'qty' => $quantity_sold,
+                                'sku' => $product_sku,
+                                'idinvoice' => $invoiceData['invoiceId']
+                            ),
+                            array('%d', '%s', '%s')
+                        );
+                    }
+                }
+    
                 wp_send_json_success('Invoice saved successfully.');
             } else {
                 wp_send_json_error('Failed to save invoice.');
@@ -384,10 +418,12 @@ class ProductHandler {
         }
     }
 
+
+
     
-    function generate_invoice_number() {
-        return 'INC' . date('YmdHis') . wp_rand(1000, 9999); // Example: INC202308241230159999
-    }
+    // function generate_invoice_number() {
+    //     return 'INC' . date('YmdHis') . wp_rand(1000, 9999); // Example: INC202308241230159999
+    // }
     
 
 }

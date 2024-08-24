@@ -65,7 +65,7 @@ class PosPage {
                             <div class="cash-summary">
                                 <div>
                                     <h3>Cash</h3>
-                                    <input type="number" id="cashbalance" class="cash-payment" value="0" onchange="changeCashBalance()">
+                                    <input type="number" id="cashbalance" class="cash-payment" value="0" onchange="">
                                     <p class="cash-bal">Cash Balance: Rs<span id="cash-balance">0.00</span></p>
                                 </div>
 
