@@ -245,3 +245,7 @@ button:hover {
     background-color: #0056b3;
 }
 
+.cash-bal {
+    font-size: 18px;
+    font-weight: 600;
+}

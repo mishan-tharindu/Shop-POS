@@ -97,6 +97,7 @@ class DatabaseInstall{
                 `qty` INT NULL,
                 `discount` VARCHAR(45) NULL,
                 `status` INT NULL,
+                `payment_type` VARCHAR(45) NULL,
                 `payment` VARCHAR(45) NULL,
                 `idproduct_stock` INT,
                 `idcustomers` INT,

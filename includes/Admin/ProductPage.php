@@ -72,9 +72,9 @@ SELECT p.idproducts, p.product_name, p.discription, p.size, ps.sku, ps.qty, ps.s
                 </div>
 
                 <div class="form-group">
-                    <label for="description">Description:</label>
-                    <textarea id="description" name="description"
-                        rows="3"><?php echo isset($product) ? esc_textarea($product->discription) : ''; ?></textarea>
+                    <label for="size">Size:</label>
+                    <textarea id="size" name="size"
+                        rows="3"><?php echo isset($product) ? esc_textarea($product->size) : ''; ?></textarea>
                 </div>
 
                 <div class="form-group">
@@ -142,12 +142,13 @@ SELECT p.idproducts, p.product_name, p.discription, p.size, ps.sku, ps.qty, ps.s
         }
 
         echo '<table class="wp-list-table widefat fixed striped">';
-        echo '<thead><tr><th>SKU</th><th>Name</th><th>Description</th><th>Category</th><th>Price</th><th>Quantity</th><th>Actions</th></tr></thead>';
+        echo '<thead><tr><th>SKU</th><th>Name</th><th>Size</th><th>Description</th><th>Category</th><th>Price</th><th>Quantity</th><th>Actions</th></tr></thead>';
         echo '<tbody>';
         foreach ($products as $product) {
             echo '<tr>';
             echo '<td>' . esc_html($product->sku) . '</td>';
             echo '<td>' . esc_html($product->product_name) . '</td>';
+            echo '<td>' . esc_html($product->size) . '</td>';
             echo '<td>' . esc_html($product->discription) . '</td>';
             echo '<td>' . esc_html($product->sub_cat_name) . '</td>';
             echo '<td>' . esc_html($product->selling_price) . '</td>';

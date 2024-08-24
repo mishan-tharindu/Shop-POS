@@ -47,10 +47,10 @@ class PosPage {
                         <div class="summary-section">
                             <div class="summary">
                                 <h3>Summary</h3>
-                                <p>Subtotal: $<span id="subtotal">0.00</span></p>
-                                <p>Discount: <input type="number" id="discount" value="0" onchange="applyDiscount()">%</p>
-                                <p>Tax (10%): $<span id="tax">0.00</span></p>
-                                <p>Total: $<span id="total">0.00</span></p>
+                                <p>Subtotal: Rs.<span id="subtotal">0.00</span></p>
+                                <p>Discount: <input type="number" id="discount" value="0" onchange="applyDiscount()">% <br><span id="discount-price">0.00</span></p>
+                                <p>Tax (0%): $<span id="tax">0.00</span></p>
+                                <p>Total: Rs.<span id="total">0.00</span></p>
                             </div>
 
                             <div class="payment-method">
@@ -62,36 +62,48 @@ class PosPage {
                                 </select>
                             </div>
 
+                            <div class="cash-summary">
+                                <div>
+                                    <h3>Cash</h3>
+                                    <input type="number" id="cashbalance" class="cash-payment" value="0" onchange="changeCashBalance()">
+                                    <p class="cash-bal">Cash Balance: Rs<span id="cash-balance">0.00</span></p>
+                                </div>
+
+                            </div>
+
                             <button onclick="finalizeSale()">Finalize Sale</button>
                         </div>
                     </div>
                 </div>
 
                 <!-- Invoice Section -->
-                <div id="invoice" style="display:none;">
-                    <h2>Invoice</h2>
-                    <p>Date: <span id="invoiceDate"></span></p>
-                    <p>Payment Method: <span id="invoicePaymentMethod"></span></p>
-                    <table id="invoiceTable">
-                        <thead>
-                            <tr>
-                                <th>Product</th>
-                                <th>Quantity</th>
-                                <th>Price</th>
-                                <th>Total</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            <!-- Invoice items will be dynamically added here -->
-                        </tbody>
-                    </table>
-                    <p>Subtotal: $<span id="invoiceSubtotal"></span></p>
-                    <p>Discount: $<span id="invoiceDiscount"></span></p>
-                    <p>Tax: $<span id="invoiceTax"></span></p>
-                    <p>Total: $<span id="invoiceTotal"></span></p>
+                <div id="invoiceOverlay">
+                    <div id="invoice" style="display:none;">
+                        <h2>Invoice</h2>
+                        <p>Date: <span id="invoiceDate"></span></p>
+                        <p>Payment Method: <span id="invoicePaymentMethod"></span></p>
+                        <table id="invoiceTable">
+                            <thead>
+                                <tr>
+                                    <th>Product</th>
+                                    <th>Quantity</th>
+                                    <th>Price</th>
+                                    <th>Total</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <!-- Invoice items will be dynamically added here -->
+                            </tbody>
+                        </table>
+                        <p>Subtotal: $<span id="invoiceSubtotal"></span></p>
+                        <p>Discount: $<span id="invoiceDiscount"></span></p>
+                        <p>Tax: $<span id="invoiceTax"></span></p>
+                        <p>Total: $<span id="invoiceTotal"></span></p>
 
-                    <button onclick="printInvoice()">Print Invoice</button>
+                        <!-- <button onclick="printInvoice();">Print Invoice</button> -->
+                    </div>
                 </div>
+                
 
 
                 <?php

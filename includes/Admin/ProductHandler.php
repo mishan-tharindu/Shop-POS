@@ -11,6 +11,10 @@ class ProductHandler {
         add_action('wp_ajax_search_product', [ $this, 'search_product']);
         add_action('wp_ajax_nopriv_search_product', [ $this, 'search_product']);
 
+
+        add_action('wp_ajax_save_invoice', [ $this, 'save_invoice']);
+        add_action('wp_ajax_nopriv_save_invoice', [ $this, 'save_invoice']);
+
         // add_action('admin_post_registor_main_category', array($this, 'registor_main_category'));
     }
 
@@ -27,7 +31,7 @@ class ProductHandler {
         // Sanitize and prepare data
         $product_name = sanitize_text_field($_POST['productName']);
         $sku = sanitize_text_field($_POST['sku']);
-        $description = sanitize_textarea_field($_POST['description']);
+        $size = sanitize_textarea_field($_POST['size']);
         $category_id = intval($_POST['category']);
         $price = sanitize_text_field($_POST['price']);
         $quantity = intval($_POST['quantity']);
@@ -37,7 +41,7 @@ class ProductHandler {
             $table_products,
             [
                 'product_name' => $product_name,
-                'discription' => $description,
+                'discription' => $size,
                 'idsub_category' => $category_id
             ],
             ['%s', '%s', '%d']
@@ -146,7 +150,7 @@ class ProductHandler {
             // Update mt_products table
             $product_data = [
                 'product_name' => sanitize_text_field($_POST['productName']),
-                'discription' => sanitize_textarea_field($_POST['description']),
+                'size' => sanitize_textarea_field($_POST['size']),
                 'idsub_category' => intval($_POST['category'])
             ];
             
@@ -214,7 +218,7 @@ class ProductHandler {
 
         // Log incoming data for debugging
         // error_log('AJAX request received');
-        error_log(print_r($_POST, true));
+        // error_log(print_r($_POST, true));
         
             global $wpdb;
 
@@ -232,10 +236,10 @@ class ProductHandler {
 
 
             $search_query = sanitize_text_field($_POST['query']);
-            $table_name = $wpdb->prefix . 'mt_products'; // Replace with your actual product table name
+            $table_products = $wpdb->prefix . 'mt_products';
+            $table_products_stock = $wpdb->prefix . 'mt_product_stock'; 
 
-            $products = $wpdb->get_results($wpdb->prepare(
-                "SELECT * FROM $table_name WHERE sku LIKE %s OR name LIKE %s",
+            $products = $wpdb->get_results($wpdb->prepare("SELECT mtp.product_name as product_name, mtp.size as size, mtps.sku as sku, mtps.qty as qty, mtps.selling_price as selling_price, mtps.discount as discount FROM `wp_mt_products` mtp JOIN wp_mt_product_stock mtps ON mtp.idproducts = mtps.idproducts WHERE mtps.sku LIKE %s OR mtp.product_name LIKE %s",
                 '%' . $wpdb->esc_like($search_query) . '%',
                 '%' . $wpdb->esc_like($search_query) . '%'
             ));
@@ -337,8 +341,53 @@ class ProductHandler {
         //     <input type='text' name='slug' value='{$category->main_cat_slug ?? $category->sub_cat_slug}'>
         //     <input type='submit' value='Update Category'>
         // </form>";
-}
+    }
 
+    function save_invoice() {
+        // check_ajax_referer('your_nonce_action', 'nonce');
+    
+        if (isset($_POST['invoiceData'])) {
+            global $wpdb;
+    
+            $invoiceData = json_decode(stripslashes($_POST['invoiceData']), true);
+            $invoiceNumber = generate_invoice_number(); // Function to generate unique invoice number
+    
+            // Get the current date and time
+            $date = current_time('Y-m-d');
+            $time = current_time('H:i:s');
+    
+            // Insert into the invoice table
+            $table_invoice = $wpdb->prefix . 'mt_invoice';
+            $inserted = $wpdb->insert(
+                $table_invoice,
+                array(
+                    'idinvoice' => $invoiceData['invoiceId'],
+                    'date' => $date,
+                    'time' => $time,
+                    'qty' => $invoiceData['qty'],
+                    'discount' => $invoiceData['discount'],
+                    'status' => 1, // Assuming 1 means 'paid' or 'active'
+                    'payment' => $invoiceData['paymentMethod'],
+                    'idproduct_stock' => '', // Replace this with the actual product stock ID
+                    'idcustomers' => '' // Replace this with the actual customer ID if needed
+                ),
+                array('%s', '%s', '%s', '%d', '%f', '%d', '%s', '%d', '%d')
+            );
+    
+            if ($inserted) {
+                wp_send_json_success('Invoice saved successfully.');
+            } else {
+                wp_send_json_error('Failed to save invoice.');
+            }
+        } else {
+            wp_send_json_error('No invoice data received.');
+        }
+    }
+
+    
+    function generate_invoice_number() {
+        return 'INC' . date('YmdHis') . wp_rand(1000, 9999); // Example: INC202308241230159999
+    }
     
 
 }

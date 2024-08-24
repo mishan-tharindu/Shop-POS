@@ -61,6 +61,7 @@ class Admin {
 
     public function enqueue_admin_scripts() {
         wp_enqueue_script('csp-admin-script', CLOTHING_SHOP_POS_PLUGIN_URL . 'assets/admin/js/admin.js', array('jquery'), '1.0', true);
+        wp_enqueue_script('csp-print-admin-script', CLOTHING_SHOP_POS_PLUGIN_URL . 'assets/admin/js/print.js', array(), null, true);
     
         wp_enqueue_style('admin-product-css', CLOTHING_SHOP_POS_PLUGIN_URL . 'assets/admin/css/product-regi.css');
 
@@ -69,6 +70,7 @@ class Admin {
             'ajax_url' => admin_url('admin-ajax.php'),
             'nonce' => wp_create_nonce('search_product_nonce')
         ));
+
 
     }
 
