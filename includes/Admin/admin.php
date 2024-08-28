@@ -27,14 +27,13 @@ class Admin {
         add_action('admin_post_delete_product', array('Inc\Admin\ProductHandler', 'delete_product'));
         add_action('admin_post_update_product', array('Inc\Admin\ProductHandler', 'update_product'));
         add_action('admin_post_save_category', ['Inc\Admin\ProductHandler', 'register_main_category']);
-        
-
+        add_action('admin_post_update_category', ['Inc\Admin\ProductHandler', 'update_category']);
+        add_action('admin_post_delete_category', ['Inc\Admin\ProductHandler', 'delete_category']);
 
     }
 
     public function addAdminMenu() {
         add_menu_page('Clothing Shop POS', 'POS Settings', 'manage_options', 'clothing-shop-pos', array($this, 'displaySettingsPage'));
-        add_menu_page('Product Management', 'Products', 'manage_options', 'product-management', array($this->productPage, 'display'));
 
         add_submenu_page(
             'clothing-shop-pos',        // The slug of the parent page
@@ -44,6 +43,7 @@ class Admin {
             'pos-menu',   // The slug by which this submenu will be identified
             array($this->posPage, 'display') // The function to call to display the submenu page content
         );
+
         add_submenu_page(
             'clothing-shop-pos',        // The slug of the parent page
             'Category',        // The title of the submenu page
@@ -51,6 +51,15 @@ class Admin {
             'manage_options',           // The capability required for this menu to be displayed to the user
             'category-menu',   // The slug by which this submenu will be identified
             array($this->categoryPage, 'view_category_page') // The function to call to display the submenu page content
+        );
+
+        add_submenu_page(
+            'clothing-shop-pos', 
+            'Product Management', 
+            'Products', 
+            'manage_options', 
+            'product-management', 
+            array($this->productPage, 'display')
         );
 
     }

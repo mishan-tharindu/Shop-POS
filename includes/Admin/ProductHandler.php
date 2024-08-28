@@ -132,7 +132,6 @@ class ProductHandler {
         }
     }
     
-
     public static function update_product() {
         if (!isset($_POST['register_product_nonce']) || !wp_verify_nonce($_POST['register_product_nonce'], 'register_product_action')) {
             wp_die('Security check failed');
@@ -316,31 +315,91 @@ class ProductHandler {
         }
     }
 
-    public function edit_category() {
-        if (!isset($_GET['id']) || !isset($_GET['type'])) {
-            wp_die('Category not specified');
+    public static function update_category() {
+        // Security check
+        if (!isset($_POST['register_category_nonce']) || !wp_verify_nonce($_POST['register_category_nonce'], 'register_category_action')) {
+            wp_die('Security check failed');
         }
 
-        $id = intval($_GET['id']);
-        $type = sanitize_text_field($_GET['type']);
+
+
         global $wpdb;
-        if ($type == 'main') {
+        
+        // Get the necessary variables
+        $category_id = ($_POST['maincategory_id'] != '') ? intval($_POST['maincategory_id']) : intval($_POST['subcategory_id']);
+        $category_type = ($_POST['maincategory_id'] != '') ? 'main' : 'sub';
+        // $category_type = isset($_POST['maincategory_id']) ? 'main' : 'sub';
+        $name = sanitize_text_field($_POST['tag-name']);
+        $slug = sanitize_text_field($_POST['slug']);
+        $parent_id = intval($_POST['parent']);
+
+        error_log("Funtion Update Category !!! Category_ID ". $category_id . "  Category Type :: " . $category_type );
+
+        // Update logic
+        if ($category_type == 'main') {
             $table = $wpdb->prefix . 'mt_main_category';
-            $category = $wpdb->get_row($wpdb->prepare("SELECT * FROM $table WHERE idmain_category = %d", $id));
+            $wpdb->update(
+                $table,
+                ['main_cat_name' => $name, 'main_cat_slug' => $slug],
+                ['idmain_category' => $category_id],
+                ['%s', '%s'],
+                ['%d']
+            );
         } else {
             $table = $wpdb->prefix . 'mt_sub_category';
-            $category = $wpdb->get_row($wpdb->prepare("SELECT * FROM $table WHERE idsub_category = %d", $id));
+            $wpdb->update(
+                $table,
+                ['sub_cat_name' => $name, 'sub_cat_slug' => $slug, 'idmain_category' => $parent_id],
+                ['idsub_category' => $category_id],
+                ['%s', '%s', '%d'],
+                ['%d']
+            );
         }
 
-        // // Assume we are in an admin form where `admin_url('admin-post.php')` is the action
-        // echo "<form method='post' action='".admin_url("admin-post.php")."'>
-        //     <input type='hidden' name='action' value='update_category'>
-        //     <input type='hidden' name='category_id' value='{$id}'>
-        //     <input type='hidden' name='category_type' value='{$type}'>
-        //     <input type='text' name='name' value='{$category->main_cat_name ?? $category->sub_cat_name}'>
-        //     <input type='text' name='slug' value='{$category->main_cat_slug ?? $category->sub_cat_slug}'>
-        //     <input type='submit' value='Update Category'>
-        // </form>";
+        // Redirect back to the category page with a success message
+        wp_redirect(add_query_arg(['page' => 'category-menu', 'status' => 'success'], admin_url('admin.php')));
+        exit;
+    }
+
+    public static function delete_category() {
+        if (!isset($_GET['delete_category_nonce']) || !wp_verify_nonce($_GET['delete_category_nonce'], 'delete_category_action')) {
+            wp_die('Security check failed');
+        }
+
+        if (isset($_GET['id']) && isset($_GET['type'])) {
+            global $wpdb;
+            $category_id = intval($_GET['id']);
+            $category_type = sanitize_text_field($_GET['type']);
+
+            if ($category_type == 'main') {
+                $table_main_category = $wpdb->prefix . 'mt_main_category';
+                $table_sub_category = $wpdb->prefix . 'mt_sub_category';
+
+                // Check if the main category has subcategories
+                $subcategories = $wpdb->get_results($wpdb->prepare(
+                    "SELECT idsub_category FROM $table_sub_category WHERE idmain_category = %d", 
+                    $category_id
+                ));
+
+                if (!empty($subcategories)) {
+                    // Redirect back with an error message if subcategories exist
+                    wp_redirect(add_query_arg(['page' => 'category-menu', 'status' => 'error', 'message' => 'Cannot delete main category with existing subcategories'], admin_url('admin.php')));
+                    exit;
+                } else {
+                    // No subcategories, safe to delete the main category
+                    $wpdb->delete($table_main_category, ['idmain_category' => $category_id]);
+                }
+
+            } else if ($category_type == 'sub') {
+                $table_sub_category = $wpdb->prefix . 'mt_sub_category';
+                // Safe to delete subcategory
+                $wpdb->delete($table_sub_category, ['idsub_category' => $category_id]);
+            }
+
+            // Redirect back with a success message
+            wp_redirect(add_query_arg(['page' => 'category-menu', 'status' => 'deleted'], admin_url('admin.php')));
+            exit;
+        }
     }
 
     function save_invoice() {
@@ -418,12 +477,6 @@ class ProductHandler {
         }
     }
 
-
-
-    
-    // function generate_invoice_number() {
-    //     return 'INC' . date('YmdHis') . wp_rand(1000, 9999); // Example: INC202308241230159999
-    // }
     
 
 }

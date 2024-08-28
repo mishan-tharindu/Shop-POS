@@ -16,19 +16,19 @@ class ProductPage {
 
         // Fetch products
         $products = $wpdb->get_results("
-SELECT p.idproducts, p.product_name, p.discription, p.size, ps.sku, ps.qty, ps.selling_price, ps.idproduct_stock, sc.sub_cat_name, mc.main_cat_name 
-            FROM wp_mt_products p
-            JOIN wp_mt_product_stock ps ON p.idproducts = ps.idproducts
-            LEFT JOIN wp_mt_sub_category sc ON p.idsub_category = sc.idsub_category
-            LEFT JOIN wp_mt_main_category mc ON sc.idsub_category = mc.idmain_category
-        ");
+                                SELECT p.idproducts, p.product_name, p.discription, p.size, ps.sku, ps.qty, ps.selling_price, ps.idproduct_stock, sc.sub_cat_name, mc.main_cat_name 
+                                            FROM wp_mt_products p
+                                            JOIN wp_mt_product_stock ps ON p.idproducts = ps.idproducts
+                                            LEFT JOIN wp_mt_sub_category sc ON p.idsub_category = sc.idsub_category
+                                            LEFT JOIN wp_mt_main_category mc ON sc.idsub_category = mc.idmain_category
+                                        ");
 
         // Fetch categories for the dropdown
         $categories = $wpdb->get_results("SELECT idsub_category, sub_cat_name, main_cat_name FROM wp_mt_sub_category sc JOIN wp_mt_main_category mc ON sc.idmain_category = mc.idmain_category");
 
         // Check for the 'status' query parameter to show the success message
         if (isset($_GET['status']) && $_GET['status'] === 'success') {
-            echo '<div class="updated notice"><p>Product successfully registered!</p></div>';
+            // echo '<div class="updated notice"><p>Product successfully registered!</p></div>';
         }
 
         // Check if the action is 'edit' and an id is provided
@@ -103,8 +103,8 @@ SELECT p.idproducts, p.product_name, p.discription, p.size, ps.sku, ps.qty, ps.s
 
                 <div class="form-group">
                     <label for="supplier">Supplier:</label>
-                    <input type="text" id="supplier" name="supplier"
-                        value="<?php echo isset($product) ? esc_attr($product->supplier) : ''; ?>" required>
+                    <input type="text" id="supplier" name="supplier" value="<?php echo isset($product) ? esc_attr($product->idgrn) : ''; ?>" required>
+                    <!-- <input type="text" id="supplier" name="supplier" value="" > -->
                 </div>
 
 
