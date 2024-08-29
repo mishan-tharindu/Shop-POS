@@ -6,6 +6,7 @@ namespace Inc\Core;
 use Inc\Admin\Admin;
 use Inc\PublicArea\PublicArea;
 use Inc\Admin\ProductHandler;
+use Inc\Admin\Invoice;
 
 
 class Init {
@@ -26,6 +27,7 @@ class Init {
         $this->defineAdminHooks();
         $this->definePublicHooks();
         $this->defineProductHandlerHooks();
+        $this->defineInvoiceHanlderHooks();
     }
 
 
@@ -48,5 +50,11 @@ class Init {
         $productHandler = new ProductHandler();
         $productHandler->register_hooks();
     }
+
+    private function defineInvoiceHanlderHooks() {
+        $invoiceHanlder = new Invoice();
+        $invoiceHanlder->invoice_hooks();
+    }
+
 
 }

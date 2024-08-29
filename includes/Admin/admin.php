@@ -7,11 +7,13 @@ class Admin {
     private $productPage;
     private $pospage;
     private $categoryPage;
+    private $invoicePage;
 
     public function __construct() {
         $this->productPage = new ProductPage();
         $this->posPage = new PosPage();
         $this->categoryPage = new CategoryPage();
+        $this->invoicePage = new Invoice();
     }
 
     public function hooks() {
@@ -22,10 +24,11 @@ class Admin {
         add_action('admin_enqueue_scripts', array($this, 'enqueue_admin_scripts'));
 
         // hooks
-
         add_action('admin_post_register_product', array('Inc\Admin\ProductHandler', 'register_product'));
         add_action('admin_post_delete_product', array('Inc\Admin\ProductHandler', 'delete_product'));
         add_action('admin_post_update_product', array('Inc\Admin\ProductHandler', 'update_product'));
+
+        // Category Hooks
         add_action('admin_post_save_category', ['Inc\Admin\ProductHandler', 'register_main_category']);
         add_action('admin_post_update_category', ['Inc\Admin\ProductHandler', 'update_category']);
         add_action('admin_post_delete_category', ['Inc\Admin\ProductHandler', 'delete_category']);
@@ -60,6 +63,15 @@ class Admin {
             'manage_options', 
             'product-management', 
             array($this->productPage, 'display')
+        );
+
+        add_submenu_page(
+            'clothing-shop-pos', 
+            'Invoice Management', 
+            'Invoice', 
+            'manage_options', 
+            'invoice-management', 
+            array($this->invoicePage, 'view_invoices')
         );
 
     }

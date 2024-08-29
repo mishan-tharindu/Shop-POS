@@ -301,10 +301,10 @@ function generateInvoiceNumber() {
     return `INC${year}${month}${day}${hours}${minutes}${seconds}`;
 }
 
-document.getElementById('cancelButton').addEventListener('click', function() {
-    // Redirect to the POS menu page
-    window.location.href = 'admin.php?page=pos-menu';
-});
+// document.getElementById('cancelButton').addEventListener('click', function() {
+//     // Redirect to the POS menu page
+//     window.location.href = 'admin.php?page=pos-menu';
+// });
 
 // function printInvoice() {
 //     window.print();
@@ -315,4 +315,48 @@ document.getElementById('cancelButton').addEventListener('click', function() {
 //     }, 1000);
 // }
 
+// Invoice Page
+
+jQuery(document).ready(function($) {
+    $('#invoiceTable tbody tr').on('click', function() {
+        const invoiceId = $(this).data('invoice-id');
+
+        console.log("Inoveice ID ::" + invoiceId);
+
+        if (invoiceId) {
+            // Make an AJAX call to get the products for the selected invoice
+            $.ajax({
+                url: ajaxurl,
+                method: 'POST',
+                data: {
+                    action: 'get_invoice_products',
+                    invoice_id: invoiceId,
+                    nonce: ajax_object.nonce
+                    // nonce: '<?php echo wp_create_nonce("get_invoice_products_nonce"); ?>'
+                },
+                success: function(response) {
+                    if (response.success) {
+                        // Populate the products table
+                        const productsTable = $('#invoiceProductsTable tbody');
+                        productsTable.empty(); // Clear previous rows
+
+                        response.data.forEach(function(product) {
+                            const row = '<tr>' +
+                                '<td>' + product.product_name + '</td>' +
+                                '<td>' + product.qty + '</td>' +
+                                '<td>' + product.selling_price + '</td>' +
+                                '<td>' + (product.qty * product.selling_price) + '</td>' +
+                                '</tr>';
+                            productsTable.append(row);
+                        });
+
+                        $('#invoiceProductsTable').show(); // Show the products table
+                    } else {
+                        alert('No products found for this invoice.');
+                    }
+                }
+            });
+        }
+    });
+});
 

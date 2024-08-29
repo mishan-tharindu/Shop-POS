@@ -102,3 +102,6 @@ document.addEventListener('DOMContentLoaded', function() {
 //     document.getElementById('imagePreview').innerHTML = ''; // Clear image previews
 // });
 
+
+
+

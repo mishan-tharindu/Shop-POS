@@ -1,4 +1,8 @@
 
+#wpbody {
+    padding: 20px 20px 20px 0px;
+}
+
 .container {
     max-width: 600px;
     margin: 0 auto;
@@ -260,3 +264,179 @@ button:hover {
     background-color: #66B0FF;
     color: white;
 }
+
+/* Invoice Page */
+.wp-mt-invoice-table {
+    height: 550px;
+    overflow-y: auto;
+    overflow-x: hidden;
+}
+
+
+/* New Css */
+
+/* Form Styling */
+.date-filter-form {
+    display: flex;
+    align-items: center;
+    background-color: #ffffff;
+    padding: 10px 20px;
+    border-radius: 8px;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+    margin-bottom: 20px;
+}
+
+.date-filter-form label {
+    font-weight: 500;
+    color: #3f51b5;
+    margin-right: 10px;
+}
+
+.date-filter-form input[type="date"] {
+    padding: 8px 12px;
+    margin-right: 20px;
+    border: 1px solid #cfd8dc;
+    border-radius: 4px;
+    background-color: #eceff1;
+    color: #333;
+    font-size: 14px;
+    transition: border-color 0.3s ease;
+}
+
+.date-filter-form input[type="date"]:focus {
+    border-color: #3f51b5;
+    background-color: #ffffff;
+}
+
+.date-filter-form .button-primary {
+    background-color: #3f51b5;
+    color: #ffffff;
+    padding: 8px 16px;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    font-size: 14px;
+    transition: background-color 0.3s ease;
+}
+
+.date-filter-form .button-primary:hover {
+    background-color: #303f9f;
+}
+
+/* General date picker input styling */
+.date-filter-form input[type="date"] {
+    background-color: #ffffff; /* Light soft blue background */
+    color: #333; /* Text color */
+    padding: 8px 12px;
+    margin-right: 20px;
+    border: 1px solid #cfd8dc;
+    border-radius: 4px;
+    font-size: 14px;
+    transition: background-color 0.3s ease;
+}
+
+/* Focus state */
+.date-filter-form input[type="date"]:focus {
+    background-color: white; /* Slightly darker blue when focused */
+    border-color: #3f51b5;
+}
+
+/* Style for the calendar icon (works in some browsers like Chrome) */
+.date-filter-form input[type="date"]::-webkit-calendar-picker-indicator {
+    background-color: white; /* Change the color of the calendar icon */
+    color: white;
+    padding: 5px;
+    border-radius: 50%;
+}
+
+/* Placeholder color (affects some browsers like Firefox) */
+.date-filter-form input[type="date"]::placeholder {
+    color: #9e9e9e;
+}
+
+/* Force a specific color in the calendar dropdown (not widely supported) */
+input[type="date"]::-webkit-inner-spin-button,
+input[type="date"]::-webkit-calendar-picker-indicator {
+    opacity: 0.8; /* Slight transparency to blend with the background */
+    filter: brightness(0.7); /* Darkens the icon */
+}
+
+/* Container for table to add scrollable area with fixed height */
+.invoice-table-container {
+    height: 250px;  /* Set the height to 250px */
+    overflow-y: auto;
+    border: 1px solid #e0e0e0;
+    border-radius: 8px;
+    box-shadow: 0 3px 6px rgba(0, 0, 0, 0.1);
+}
+
+/* Material UI style for the table */
+/* General styling for both tables */
+.wp-mt-invoice-table, .wp-list-table {
+    width: 100%;
+    border-collapse: collapse;
+    background-color: #ffffff;
+    font-family: 'Roboto', sans-serif;
+    color: #333;
+    border-radius: 8px;
+    overflow: hidden;
+}
+
+.wp-mt-invoice-table th, .wp-list-table th, .wp-mt-invoice-table td, .wp-list-table td {
+    padding: 12px 15px;
+    text-align: left;
+}
+
+.wp-mt-invoice-table thead, .wp-list-table thead {
+    background-color: #f5f5f5;
+    color: #424242;
+    font-weight: bold;
+    text-transform: uppercase;
+}
+
+.wp-mt-invoice-table tbody tr:nth-child(odd), .wp-list-table tbody tr:nth-child(odd) {
+    background-color: #f9f9f9;
+}
+
+.wp-mt-invoice-table tbody tr:nth-child(even), .wp-list-table tbody tr:nth-child(even) {
+    background-color: #ffffff;
+}
+
+.wp-mt-invoice-table tbody tr:hover, .wp-list-table tbody tr:hover {
+    background-color: #e0f7fa;
+    cursor: pointer;
+}
+
+/* Scrollbar styling */
+.invoice-table-container, .invoice-products-container {
+    height: 250px;  /* Adjust height as needed */
+    overflow-y: auto;
+    border: 1px solid #e0e0e0;
+    border-radius: 8px;
+    box-shadow: 0 3px 6px rgba(0, 0, 0, 0.1);
+}
+
+.invoice-table-container::-webkit-scrollbar, .invoice-products-container::-webkit-scrollbar {
+    width: 8px;
+}
+
+.invoice-table-container::-webkit-scrollbar-track, .invoice-products-container::-webkit-scrollbar-track {
+    background: #f1f1f1;
+}
+
+.invoice-table-container::-webkit-scrollbar-thumb, .invoice-products-container::-webkit-scrollbar-thumb {
+    background: #888;
+    border-radius: 4px;
+}
+
+.invoice-table-container::-webkit-scrollbar-thumb:hover, .invoice-products-container::-webkit-scrollbar-thumb:hover {
+    background: #555;
+}
+
+.wp-mt-invoice-table tbody {
+    height: 100px;       /* Just for the demo          */
+    overflow-y: auto;    /* Trigger vertical scroll    */
+    overflow-x: hidden;  /* Hide the horizontal scroll */
+}
+
+
