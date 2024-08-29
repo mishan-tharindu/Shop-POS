@@ -8,12 +8,14 @@ class Admin {
     private $pospage;
     private $categoryPage;
     private $invoicePage;
+    private $returnproductsPage;
 
     public function __construct() {
         $this->productPage = new ProductPage();
         $this->posPage = new PosPage();
         $this->categoryPage = new CategoryPage();
         $this->invoicePage = new Invoice();
+        $this->returnproductsPage = new ReturnProduct();
     }
 
     public function hooks() {
@@ -72,6 +74,14 @@ class Admin {
             'manage_options', 
             'invoice-management', 
             array($this->invoicePage, 'view_invoices')
+        );
+        add_submenu_page(
+            'clothing-shop-pos', 
+            'Return Product Management', 
+            'Return Product', 
+            'manage_options', 
+            'return-product', 
+            array($this->returnproductsPage, 'display_return_product_page')
         );
 
     }

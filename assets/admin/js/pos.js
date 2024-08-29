@@ -360,3 +360,91 @@ jQuery(document).ready(function($) {
     });
 });
 
+// Return Product
+jQuery(document).ready(function($) {
+    $('#fetchInvoiceDetails').on('click', function() {
+        var invoiceID = $('#invoiceID').val().trim();
+        
+        if (invoiceID) {
+            $.ajax({
+                url: ajax_object.ajax_url,
+                method: 'POST',
+                data: {
+                    action: 'fetch_invoice_details',
+                    invoiceID: invoiceID,
+                    nonce: ajax_object.nonce
+                },
+                success: function(response) {
+                    if (response.success) {
+                        var products = response.data;
+                        var tbody = $('#invoiceProductsTable tbody');
+                        tbody.empty();
+
+                        products.forEach(function(product) {
+                            var row = '<tr>' +
+                                      '<td><input type="checkbox" name="selected_products[]" value="' + product.idproduct_stock + '"></td>' +
+                                      '<td>' + product.product_name + '</td>' +
+                                      '<td>' + product.qty + '</td>' +
+                                      '<td><input type="number" name="return_qty[' + product.idproduct_stock + ']" max="' + product.qty + '" min="1"></td>' +
+                                      '</tr>';
+                            tbody.append(row);
+                        });
+
+                        $('#invoiceDetails').show();
+                    } else {
+                        alert('Invoice not found or no products in the invoice.');
+                    }
+                }
+            });
+        } else {
+            alert('Please enter an Invoice ID.');
+        }
+    });
+});
+
+// Handle the Return Process
+
+jQuery(document).ready(function($) {
+    // Fetch and display invoice details when the button is clicked
+    $('#fetchInvoiceDetails').on('click', function() {
+        var invoiceID = $('#invoiceID').val().trim();
+        
+        if (invoiceID) {
+            $.ajax({
+                url: ajax_object.ajax_url,
+                method: 'POST',
+                data: {
+                    action: 'fetch_invoice_details',
+                    invoiceID: invoiceID,
+                    nonce: ajax_object.nonce
+                },
+                success: function(response) {
+                    if (response.success) {
+                        var products = response.data;
+                        var tbody = $('#invoiceProductsTable tbody');
+                        tbody.empty();
+
+                        products.forEach(function(product) {
+                            var row = '<tr>' +
+                                      '<td><input type="checkbox" name="selected_products[]" value="' + product.idproduct_stock + '"></td>' +
+                                      '<td>' + product.product_name + '</td>' +
+                                      '<td>' + product.qty + '</td>' +
+                                      '<td><input type="number" name="return_qty[' + product.idproduct_stock + ']" max="' + product.qty + '" min="1"></td>' +
+                                      '</tr>';
+                            tbody.append(row);
+                        });
+
+                        $('#invoiceDetails').show();
+                    } else {
+                        alert('Invoice not found or no products in the invoice.');
+                    }
+                }
+            });
+        } else {
+            alert('Please enter an Invoice ID.');
+        }
+    });
+});
+
+
+
