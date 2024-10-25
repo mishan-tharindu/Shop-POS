@@ -23,13 +23,30 @@ class CategoryPage
 
         $categories = $wpdb->get_results($query);
         
-        if (isset($_GET['status']) && $_GET['status'] === 'success') {
-            echo '<div class="updated notice"><p>Category successfully registered!</p></div>';
-        } else if (isset($_GET['status']) && $_GET['status'] === 'deleted') {
-            echo '<div class="updated notice"><p>Category successfully deleted!</p></div>';
-        } else if (isset($_GET['status']) && $_GET['status'] === 'error' && isset($_GET['message'])) {
-            echo '<div class="error notice"><p>' . esc_html($_GET['message']) . '</p></div>';
-        }
+        // if (isset($_GET['status']) && $_GET['status'] === 'success') {
+        //     echo '<div class="updated notice"><p>Category successfully registered!</p></div>';
+        // } else if (isset($_GET['status']) && $_GET['status'] === 'deleted') {
+        //     echo '<div class="updated notice"><p>Category successfully deleted!</p></div>';
+        // } else if (isset($_GET['status']) && $_GET['status'] === 'error' && isset($_GET['message'])) {
+        //     echo '<div class="error notice"><p>' . esc_html($_GET['message']) . '</p></div>';
+        // }
+
+                // Pass the message to JavaScript
+            $toast_data = array();
+            if (isset($_GET['status'])) {
+                if ($_GET['status'] === 'success') {
+                    $toast_data['message'] = 'Category successfully registered!';
+                    $toast_data['type'] = 'success';
+                } elseif ($_GET['status'] === 'deleted') {
+                    $toast_data['message'] = 'Category successfully deleted!';
+                    $toast_data['type'] = 'success';
+                } elseif ($_GET['status'] === 'error' && isset($_GET['message'])) {
+                    $toast_data['message'] = esc_html($_GET['message']);
+                    $toast_data['type'] = 'error';
+                }
+            }
+        
+            wp_localize_script('toastr-js', 'toast_data', $toast_data);
 
         $categoryType = $_GET['type'];
 

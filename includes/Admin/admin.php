@@ -9,6 +9,8 @@ class Admin {
     private $categoryPage;
     private $invoicePage;
     private $returnproductsPage;
+    private $viewreturnproductsPage;
+    private $viewPluginHomePage;
 
     public function __construct() {
         $this->productPage = new ProductPage();
@@ -16,6 +18,8 @@ class Admin {
         $this->categoryPage = new CategoryPage();
         $this->invoicePage = new Invoice();
         $this->returnproductsPage = new ReturnProduct();
+        $this->viewreturnproductsPage = new ViewReturnProducts();
+        $this->viewPluginHomePage = new ViewPluginHomePage();
     }
 
     public function hooks() {
@@ -24,6 +28,8 @@ class Admin {
 
         add_action('admin_menu', array($this, 'addAdminMenu'));
         add_action('admin_enqueue_scripts', array($this, 'enqueue_admin_scripts'));
+
+        // add_action('wp_enqueue_scripts', array($this, 'enqueue_toastr_scripts'));
 
         // hooks
         add_action('admin_post_register_product', array('Inc\Admin\ProductHandler', 'register_product'));
@@ -35,10 +41,12 @@ class Admin {
         add_action('admin_post_update_category', ['Inc\Admin\ProductHandler', 'update_category']);
         add_action('admin_post_delete_category', ['Inc\Admin\ProductHandler', 'delete_category']);
 
+        
+
     }
 
     public function addAdminMenu() {
-        add_menu_page('Clothing Shop POS', 'POS Settings', 'manage_options', 'clothing-shop-pos', array($this, 'displaySettingsPage'));
+        add_menu_page('Clothing Shop POS', 'POS Settings', 'manage_options', 'clothing-shop-pos', array($this->viewPluginHomePage, 'view_pluginhomepage'));
 
         add_submenu_page(
             'clothing-shop-pos',        // The slug of the parent page
@@ -83,6 +91,14 @@ class Admin {
             'return-product', 
             array($this->returnproductsPage, 'display_return_product_page')
         );
+        add_submenu_page(
+            'clothing-shop-pos', 
+            'View Return Products', 
+            'View Return Products', 
+            'manage_options', 
+            'view-return-product', 
+            array($this->viewreturnproductsPage, 'view_returnproducts')
+        );
 
     }
 
@@ -103,7 +119,17 @@ class Admin {
         ));
 
 
+        wp_enqueue_script('toastr-js', 'https://cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/js/toastr.min.js', ['jquery'], null, true);
+        wp_enqueue_style('toastr-css', 'https://cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/css/toastr.min.css');
+
+
     }
+
+    // function enqueue_toastr_scripts() {
+
+    // }
+    
+
 
 
     

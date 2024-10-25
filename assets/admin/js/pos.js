@@ -18,11 +18,12 @@ jQuery(document).ready(function($) {
                     nonce: ajax_object.nonce  // Sending nonce for security.
                 },
                 success: function(response) {
-                    console.log(response);  // Check the response for debugging.
+                    // console.log(response);  // Check the response for debugging.
                     displaySearchResults(response.data);
                 },
                 error: function(xhr) {
-                    console.error('AJAX error:', xhr.responseText);  // Log detailed error.
+                    // console.error('AJAX error:', xhr.responseText);  // Log detailed error.
+                    toastr.error( xhr.responseText,'Error', {timeOut: 3000, progressBar: true});
                 }
             });
 
@@ -40,7 +41,7 @@ jQuery(document).ready(function($) {
 
         products.forEach(product => {
 
-            console.log("Product Name :: "+ product.product_name +" -- SKU ::"+product.sku+" -- selling Price ::"+product.selling_price) ;
+            // console.log("Product Name :: "+ product.product_name +" -- SKU ::"+product.sku+" -- selling Price ::"+product.selling_price) ;
 
             let resultItem = $('<div>')
                 .addClass('result-item')
@@ -225,7 +226,7 @@ function finalizeSale() {
     };
 
 
-    console.log("JASON Object :: "+JSON.stringify(invoiceData));
+    // console.log("JASON Object :: "+JSON.stringify(invoiceData));
 
     const xhr = new XMLHttpRequest();
     xhr.open('POST', ajax_object.ajax_url, true);
@@ -352,7 +353,8 @@ jQuery(document).ready(function($) {
 
                         $('#invoiceProductsTable').show(); // Show the products table
                     } else {
-                        alert('No products found for this invoice.');
+                        // alert('No products found for this invoice.');
+                        toastr.error('No products found for this invoice.','Error', {timeOut: 3000, progressBar: true});
                     }
                 }
             });
@@ -392,12 +394,14 @@ jQuery(document).ready(function($) {
 
                         $('#invoiceDetails').show();
                     } else {
-                        alert('Invoice not found or no products in the invoice.');
+                        toastr.error('Invoice not found or no products in the invoice.','Error', {timeOut: 3000, progressBar: true});
+                        // alert('Invoice not found or no products in the invoice.');
                     }
                 }
             });
         } else {
-            alert('Please enter an Invoice ID.');
+            // alert('Please enter an Invoice ID.');
+            toastr.error('Please enter an Invoice ID.','Error', {timeOut: 3000, progressBar: true});
         }
     });
 });
@@ -436,12 +440,64 @@ jQuery(document).ready(function($) {
 
                         $('#invoiceDetails').show();
                     } else {
-                        alert('Invoice not found or no products in the invoice.');
+                        // alert('Invoice not found or no products in the invoice.');
+                        toastr.error('Invoice not found or no products in the invoice.','Error', {timeOut: 3000, progressBar: true});
                     }
                 }
             });
         } else {
-            alert('Please enter an Invoice ID.');
+            // alert('Please enter an Invoice ID.');
+            toastr.error('Please enter an Invoice ID.','Error', {timeOut: 3000, progressBar: true});
+        }
+    });
+});
+
+// Return Invoice Products 
+
+jQuery(document).ready(function($) {
+    $('#returninvoiceTable tbody tr').on('click', function() {
+        const re_invoiceId = $(this).data('return-invoice-id');
+
+        console.log("Re Inoveice ID ::" + re_invoiceId);
+
+        if (re_invoiceId) {
+            // Make an AJAX call to get the products for the selected invoice
+            $.ajax({
+                url: ajaxurl,
+                method: 'POST',
+                data: {
+                    action: 'get_returninvoice_products',
+                    re_invoiceId: re_invoiceId,
+                    nonce: ajax_object.nonce
+                    // nonce: '<?php echo wp_create_nonce("get_invoice_products_nonce"); ?>'
+                },
+                success: function(response) {
+                    if (response.success) {
+                        // console.log("response.data :::" +response.data);
+                        // Populate the products table
+                        const productsTable = $('#returninvoiceProductsTable tbody');
+                        productsTable.empty(); // Clear previous rows
+
+                        response.data.forEach(function(product) {
+                            console.log("response.data :::" +product);
+                            const row = '<tr>' +
+                                '<td>' + product.product_name + '</td>' +
+                                '<td>' + product.note + '</td>' +
+                                '<td>' + product.qty + '</td>' +
+                                '<td>' + product.selling_price + '</td>' +
+                                '<td>' + (product.qty * product.selling_price) + '</td>' +
+                                '</tr>';
+                            productsTable.append(row);
+                        });
+
+                        $('#returninvoiceProductsTable').show(); // Show the products table
+                    } else {
+                        // showErrorToast('No products found for this Return invoice.', 3000);
+                        toastr.error('No products found for this Return invoice.','Error', {timeOut: 3000, progressBar: true});
+                        // alert('No products found for this Return invoice.');
+                    }
+                }
+            });
         }
     });
 });

@@ -371,7 +371,8 @@ class ProductHandler {
             $category_id = intval($_GET['id']);
             $category_type = sanitize_text_field($_GET['type']);
 
-            if ($category_type == 'main') {
+            if ($category_type === 'main') {
+                error_log("Main Category Delete");
                 $table_main_category = $wpdb->prefix . 'mt_main_category';
                 $table_sub_category = $wpdb->prefix . 'mt_sub_category';
 
@@ -383,21 +384,57 @@ class ProductHandler {
 
                 if (!empty($subcategories)) {
                     // Redirect back with an error message if subcategories exist
-                    wp_redirect(add_query_arg(['page' => 'category-menu', 'status' => 'error', 'message' => 'Cannot delete main category with existing subcategories'], admin_url('admin.php')));
+                    // wp_redirect(add_query_arg(['page' => 'category-menu', 'status' => 'error', 'message' => 'Cannot delete main category with existing subcategories'], admin_url('admin.php')));
+                    // exit;
+                    wp_redirect(add_query_arg(array('status' => 'error', 'message' => urlencode('Cannot delete main category with existing subcategories')), admin_url('admin.php?page=category-menu')));
                     exit;
+
+
                 } else {
                     // No subcategories, safe to delete the main category
                     $wpdb->delete($table_main_category, ['idmain_category' => $category_id]);
                 }
 
-            } else if ($category_type == 'sub') {
+            } else if ($category_type === 'sub') {
+                // error_log("Sub Category Delete");
+                // error_log("Sub Category " . $category_id);
+
+                // $table_sub_category = $wpdb->prefix . 'mt_sub_category';
+                // // Safe to delete subcategory
+                // $wpdb->delete($table_sub_category, ['idsub_category' => $category_id]);
+
+                error_log("Sub Category Delete");
                 $table_sub_category = $wpdb->prefix . 'mt_sub_category';
+                $table_products = $wpdb->prefix . 'mt_products';  // Assuming you have a products table
+    
+                // Check if the subcategory has any associated products
+                $products = $wpdb->get_results($wpdb->prepare(
+                    "SELECT idproducts FROM $table_products WHERE idsub_category = %d", 
+                    $category_id
+                ));
+    
+                if (!empty($products)) {
+                    // Redirect back with an error message if products exist in the subcategory
+                    wp_redirect(add_query_arg(array('status' => 'error', 'message' => urlencode('Cannot delete subcategory with assigned products')), admin_url('admin.php?page=category-menu')));
+                    exit;
+                }
+    
                 // Safe to delete subcategory
-                $wpdb->delete($table_sub_category, ['idsub_category' => $category_id]);
+                try {
+                    $wpdb->delete($table_sub_category, ['idsub_category' => $category_id]);
+                } catch (Exception $e) {
+                    // If an error occurs during deletion, redirect back with an error message
+                    wp_redirect(add_query_arg(array('status' => 'error', 'message' => urlencode('Failed to delete subcategory: ' . $e->getMessage())), admin_url('admin.php?page=category-menu')));
+                    exit;
+                }
+
             }
 
             // Redirect back with a success message
-            wp_redirect(add_query_arg(['page' => 'category-menu', 'status' => 'deleted'], admin_url('admin.php')));
+            // wp_redirect(add_query_arg(['page' => 'category-menu', 'status' => 'deleted'], admin_url('admin.php')));
+            // exit;
+
+            wp_redirect(add_query_arg(array('status' => 'deleted'), admin_url('admin.php?page=category-menu')));
             exit;
         }
     }

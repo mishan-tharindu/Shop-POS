@@ -80,27 +80,15 @@ document.addEventListener('DOMContentLoaded', function() {
     });
 });
 
-// document.getElementById('productForm').addEventListener('submit', function(event) {
-//     event.preventDefault();
-
-//     // Collect form data
-//     const productName = document.getElementById('productName').value;
-//     const sku = document.getElementById('sku').value;
-//     const description = document.getElementById('description').value;
-//     const category = document.getElementById('category').value;
-//     const price = document.getElementById('price').value;
-//     const quantity = document.getElementById('quantity').value;
-//     const supplier = document.getElementById('supplier').value;
-//     const productImages = document.getElementById('productImages').files;
-
-//     // Display success message
-//     const successMessage = document.getElementById('successMessage');
-//     successMessage.textContent = `Product "${productName}" registered successfully with ${productImages.length} images!`;
-
-//     // Reset form
-//     document.getElementById('productForm').reset();
-//     document.getElementById('imagePreview').innerHTML = ''; // Clear image previews
-// });
+jQuery(document).ready(function($) {
+    if (toast_data.message) {
+        if (toast_data.type === 'success') {
+            toastr.success(toast_data.message, 'Success', {timeOut: 3000});
+        } else if (toast_data.type === 'error') {
+            toastr.error(toast_data.message, 'Error', {timeOut: 3000});
+        }
+    }
+});
 
 
 

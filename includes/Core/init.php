@@ -8,6 +8,7 @@ use Inc\PublicArea\PublicArea;
 use Inc\Admin\ProductHandler;
 use Inc\Admin\Invoice;
 use Inc\Admin\ReturnProductHandler;
+use Inc\Admin\ViewReturnProducts;
 
 
 class Init {
@@ -30,6 +31,7 @@ class Init {
         $this->defineProductHandlerHooks();
         $this->defineInvoiceHanlderHooks();
         $this->defineReturnProductHanlderHooks();
+        $this->defineViewReturnProductHanlderHooks();
     }
 
 
@@ -60,6 +62,10 @@ class Init {
     private function defineReturnProductHanlderHooks() {
         $returnProductHanlder = new ReturnProductHandler();
         $returnProductHanlder->returnproduct_hooks();
+    }
+    private function defineViewReturnProductHanlderHooks() {
+        $viewreturnProductHanlder = new ViewReturnProducts();
+        $viewreturnProductHanlder->returnproducts_hooks();
     }
 
 

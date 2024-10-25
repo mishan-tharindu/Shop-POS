@@ -104,7 +104,7 @@ button:hover {
 /* POS Page Css */
 .pos-container {
     max-width: 90%;
-    margin: 10% auto;
+    margin: 5% auto;
     background-color: #fff;
     padding: 20px;
     border-radius: 8px;
@@ -266,11 +266,11 @@ button:hover {
 }
 
 /* Invoice Page */
-.wp-mt-invoice-table {
+/* .wp-mt-invoice-table {
     height: 550px;
     overflow-y: auto;
     overflow-x: hidden;
-}
+} */
 
 
 /* New Css */
@@ -433,11 +433,6 @@ input[type="date"]::-webkit-calendar-picker-indicator {
     background: #555;
 }
 
-.wp-mt-invoice-table tbody {
-    height: 100px;       /* Just for the demo          */
-    overflow-y: auto;    /* Trigger vertical scroll    */
-    overflow-x: hidden;  /* Hide the horizontal scroll */
-}
 
 /* Return Product */
 #invoiceProductsTable {
@@ -457,8 +452,110 @@ input[type="date"]::-webkit-calendar-picker-indicator {
     margin-top: 20px;
 }
 
-input[type="number"] {
-    width: 60px;
+.wp-core-ui select {
+    height: 45px;
+    border-color: #007bff !important;
 }
 
+#productForm * input,  #productForm textarea{
+    height: 45px;
+    border: none;
+}
 
+/* Retrun Invoice  */
+#returnProductForm input {
+    margin-bottom: 20px;
+}
+
+* input{
+    height: 45px;
+    border-color: #007bff !important;
+}
+
+textarea{
+    height: 150px;
+    border-color: #007bff !important;
+}
+
+/* Display Home Page */
+.dashboard-container {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 20px;
+    border: 2px solid #e0e0e0;
+    background-color: #ffffff;
+    border-radius: 8px;
+}
+
+.grid-container {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    grid-gap: 20px;
+}
+
+.grid-item {
+    background-color: #ffffff;
+    padding: 20px;
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+    border-radius: 8px;
+    min-height: 250px;
+}
+
+.graph {
+    grid-column: 1 / 2;
+}
+
+.buttons {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: space-around;
+    align-items: center;
+}
+
+.material-btn {
+    padding: 10px 20px;
+    margin: 10px;
+    background-color: #3f51b5;
+    color: white;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
+    transition: background-color 0.3s;
+}
+
+.material-btn:hover {
+    background-color: #303f9f;
+}
+
+.low-stock, .best-sales {
+    min-height: 200px;
+}
+
+/* Low stock Css */
+
+.low-stock-container {
+    padding: 20px;
+    background-color: #f9f9f9;
+    border: 1px solid #e5e5e5;
+    border-radius: 5px;
+}
+
+.low-stock-container h3 {
+    font-size: 18px;
+    margin-bottom: 15px;
+}
+
+.low-stock-container table {
+    width: 100%;
+    margin-top: 10px;
+}
+
+.low-stock-container th, .low-stock-container td {
+    padding: 10px;
+    text-align: left;
+}
+
+.low-stock-container tbody tr:nth-child(odd) {
+    background-color: #f1f1f1;
+}
