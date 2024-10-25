@@ -3,7 +3,7 @@
 Plugin Name: Clothing Shop POS
 Plugin URI:  http://yourwebsite.com/
 Description: A comprehensive POS system for clothing shops.
-Version:     1.0
+Version:     1.5 v
 Author:      Mishan Tharindu
 Author URI:  http://yourwebsite.com/
 License:     GPL2

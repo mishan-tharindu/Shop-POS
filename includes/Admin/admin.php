@@ -118,7 +118,7 @@ class Admin {
             'nonce' => wp_create_nonce('search_product_nonce')
         ));
 
-
+        // Toast Script
         wp_enqueue_script('toastr-js', 'https://cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/js/toastr.min.js', ['jquery'], null, true);
         wp_enqueue_style('toastr-css', 'https://cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/css/toastr.min.css');
 

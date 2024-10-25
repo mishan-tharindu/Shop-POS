@@ -13,7 +13,6 @@ class Invoice {
         add_action('wp_ajax_nopriv_get_invoice_products', [$this,'get_invoice_products']);
     }
 
-
     public function view_invoices() {
         $start_date = isset($_GET['start_date']) ? sanitize_text_field($_GET['start_date']) : '';
         $end_date = isset($_GET['end_date']) ? sanitize_text_field($_GET['end_date']) : '';
@@ -82,7 +81,6 @@ class Invoice {
 
         <?php
     }
-
 
     public function invoices_tbody($start_date = '', $end_date = '') {
         global $wpdb;
